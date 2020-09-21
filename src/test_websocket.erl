@@ -16,6 +16,7 @@ start() ->
 
     {ok, Socket} = gen_tcp:accept(LSock),
 
+    io:format("server start..."),
     loop(Socket),
 
     gen_tcp:close(Socket).
