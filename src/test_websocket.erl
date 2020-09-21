@@ -16,11 +16,14 @@ start() ->
 
     {ok, Socket} = gen_tcp:accept(LSock),
 
-    io:format("server start..."),
-    loop(Socket),
+    io:format("server start...\n"),
+    handshake(Socket),
 
     gen_tcp:close(Socket).
 
-loop(Socket) ->
+handshake(Socket) ->
     Ret = gen_tcp:recv(Socket, 0, 5*1000),
-    io:format("Ret=~w", [Ret]).
+    io:format("Ret=~w", [Ret]),
+
+    gen_tcp:send(Socket, ""),
+    ok.

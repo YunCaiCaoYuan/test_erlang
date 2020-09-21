@@ -6,7 +6,15 @@
 
 
 start() ->
+    inets:start(),
+
     URL = "http://127.0.0.1:88",
-    Headers = [{"Connection", "Upgrade"}],
-    httpc:request({URL, Headers}),
+    Headers = [
+        {"Origin", URL},
+        {"Connection", "Upgrade"},
+        {"Upgrade", "websocket"},
+        {"Sec-WebSocket-Version", "13"},
+        {"Sec-WebSocket-Key", "w4v7O6xFTi36lq3RNcgctw=="}
+    ],
+    httpc:request(get, {URL, Headers}, [], []),
     ok.

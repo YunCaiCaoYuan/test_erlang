@@ -1,4 +1,4 @@
 @echo off
-werl -pa .\ebin -s test_websocket start
+erl -pa .\ebin -s test_websocket start
 
 pause
