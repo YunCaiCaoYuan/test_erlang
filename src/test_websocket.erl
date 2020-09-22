@@ -30,7 +30,8 @@ start() ->
     io:format("server start...\n"),
     handshake(Socket),
 
-    gen_tcp:close(Socket).
+%%    gen_tcp:close(Socket).
+    ok.
 
 handshake(Socket) ->
     {ok, Bin} = gen_tcp:recv(Socket, 0, 5*1000),
