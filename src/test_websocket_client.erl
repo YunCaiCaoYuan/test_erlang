@@ -16,5 +16,7 @@ start() ->
         {"Sec-WebSocket-Version", "13"},
         {"Sec-WebSocket-Key", "w4v7O6xFTi36lq3RNcgctw=="}
     ],
-    httpc:request(get, {URL, Headers}, [], []),
+    {ok, Ret} = httpc:request(get, {URL, Headers}, [], []),
+    io:format("Ret=~p", [Ret]),
+
     ok.
