@@ -10,13 +10,15 @@ start() ->
 
     URL = "http://127.0.0.1:88",
     Headers = [
-        {"Origin", URL},
-        {"Connection", "Upgrade"},
-        {"Upgrade", "websocket"},
-        {"Sec-WebSocket-Version", "13"},
-        {"Sec-WebSocket-Key", "w4v7O6xFTi36lq3RNcgctw=="}
+        {"origin", URL},
+        {"connection", "Upgrade"},
+        {"upgrade", "websocket"},
+        {"sec-websocket-version", "13"},
+        {"sec-webSocket-key", "w4v7O6xFTi36lq3RNcgctw=="}
     ],
-    {ok, Ret} = httpc:request(get, {URL, Headers}, [], []),
+    io:format("client start...\n"),
+
+    Ret = httpc:request(get, {URL, Headers}, [], []),
     io:format("Ret=~p", [Ret]),
 
     ok.

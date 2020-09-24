@@ -8,7 +8,13 @@
                   ,{packet, 0}
                   ,{active, false}
                   ,{reuseaddr, true}
-                  ,{exit_on_close, false}
+                  ,{nodelay, true}
+                  ,{delay_send, true}
+                  ,{high_watermark, 65536}
+                  ,{exit_on_close, true}
+                  ,{send_timeout, 5000}
+                  ,{send_timeout_close, true}
+                  ,{keepalive, true}
                   ]).
 
 -define(WS_MAGIC_KEY, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").
@@ -25,12 +31,15 @@
 start() ->
     {ok, LSock} = gen_tcp:listen(?PORT, ?TCP_OPTS),
 
+    io:format("server start...\n"),
     {ok, Socket} = gen_tcp:accept(LSock),
 
-    io:format("server start...\n"),
     handshake(Socket),
 
 %%    gen_tcp:close(Socket).
+
+    loop(Socket),
+    io:format("server stop...\n"),
     ok.
 
 handshake(Socket) ->
@@ -45,9 +54,13 @@ handshake(Socket) ->
     io:format("ClientKey=~p\n", [ClientKey]),
 
     AcceptKey = base64:encode(crypto:hash(sha, erlang:list_to_binary([ClientKey, ?WS_MAGIC_KEY]))),
-    gen_tcp:send(Socket, erlang:list_to_binary(?WS_REP(AcceptKey))),
+    ok = gen_tcp:send(Socket, erlang:list_to_binary(?WS_REP(AcceptKey))),
 
     ok.
+
+loop(Socket) ->
+    %% ...
+    loop(Socket).
 
 trim(Str, Chars) ->
     rtrim(ltrim(Str, Chars), Chars).
