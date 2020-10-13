@@ -5,6 +5,7 @@
 -export([start/0]).
 
 
+%% http2.0以前都是短链接，也就是每次请求使用一个新连接
 start() ->
     inets:start(),
 
