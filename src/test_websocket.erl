@@ -25,8 +25,23 @@
     "Sec-WebSocket-Accept: ~s\r\n\r\n"
 ).
 -define(WS_REP(AcceptKey), io_lib:format(?REP, [AcceptKey])).
+-define(SecWebKey, "Sec-WebSocket-Key").
+
+-define(RECV_TIMEOUT, 120*1000).
+
+-record(conn, {
+  status,      %% 状态
+  mask,        %% 掩码标记
+  length,      %% 载荷长度
+  fin,         %% 0/1 是否最后一个分片
+  opcode       %% 操作码
+}).
+
+-define(true, 1).
+-define(false, 0).
 
 -define(trim_def, [32, 9, 10, 13, 0, 11]).
+
 
 start() ->
     {ok, LSock} = gen_tcp:listen(?PORT, ?TCP_OPTS),
@@ -36,9 +51,9 @@ start() ->
 
     handshake(Socket),
 
-%%    gen_tcp:close(Socket).
+    loop(Socket, #conn{status = read_head}),
 
-    loop(Socket),
+%%    gen_tcp:close(Socket),
     io:format("server stop...\n"),
     ok.
 
@@ -50,7 +65,7 @@ handshake(Socket) ->
     HeadList = [erlang:list_to_tuple([trim(Ele, ?trim_def) || Ele <- string:tokens(erlang:binary_to_list(Elem), ":")]) || Elem <- BinList, Elem =/= <<>>],
     io:format("HeadList=~p\n", [HeadList]),
 
-    ClientKey = proplists:get_value("sec-websocket-key", HeadList),
+    ClientKey = proplists:get_value(?SecWebKey, HeadList),
     io:format("ClientKey=~p\n", [ClientKey]),
 
     AcceptKey = base64:encode(crypto:hash(sha, erlang:list_to_binary([ClientKey, ?WS_MAGIC_KEY]))),
@@ -58,9 +73,60 @@ handshake(Socket) ->
 
     ok.
 
-loop(Socket) ->
-    %% ...
-    loop(Socket).
+%% 接收数据
+loop(Socket, ConnState = #conn{status = read_head}) ->
+    case sync_recv(Socket, 2, ?RECV_TIMEOUT) of
+      {ok, Bin} ->
+        case Bin of
+          <<FIN:1,_RSV:3,Opcode:4,Mask:1, PayloadLen:7>> ->
+            case PayloadLen of
+              0 ->
+                loop(Socket, ConnState#conn{status = read_head});
+              126 ->
+                loop(Socket, ConnState = #conn{status = read_payload_len, mask = Mask});
+              127 ->
+                loop(Socket, ConnState = #conn{status = read_payload_len2, mask = Mask});
+              _ ->
+                case Mask of
+                  ?true ->
+                    sync_recv(Socket, 4+PayloadLen, ?RECV_TIMEOUT);
+                  ?false ->
+                    sync_recv(Socket, PayloadLen, ?RECV_TIMEOUT)
+                end
+            end;
+          _ ->
+            loop(Socket, ConnState)
+        end;
+      _ ->
+        loop(Socket, ConnState)
+    end;
+loop(Socket, ConnState = #conn{status = read_payload_len, mask = Mask}) ->
+  case sync_recv(Socket, 2, ?RECV_TIMEOUT) of
+    {ok, Bin} ->
+      <<PayloadLen:16>> = <<Bin/binary>>,
+      case Mask of
+        ?true ->
+          loop(Socket, ConnState = #conn{status = read_payload_data, mask = Mask});
+        ?false ->
+          loop(Socket, ConnState = #conn{status = read_payload_data, mask = Mask})
+      end;
+    _ ->
+      ok
+  end,
+  loop(Socket, ConnState);
+loop(Socket, ConnState = #conn{status = read_payload_len2}) ->
+  sync_recv(Socket, 8, ?RECV_TIMEOUT),
+  loop(Socket, ConnState);
+loop(Socket, ConnState = #conn{status = read_payload_data, length = Len}) ->
+  sync_recv(Socket, 8, ?RECV_TIMEOUT),
+  loop(Socket, ConnState).
+
+
+sync_recv(Socket, Len, TimeOut) ->
+  gen_tcp:recv(Socket, Len, TimeOut).
+
+
+%% =========================== local function ===========================
 
 trim(Str, Chars) ->
     rtrim(ltrim(Str, Chars), Chars).
