@@ -12,6 +12,7 @@
 %% API
 -export([memory/0]).
 
+%% 查看内存占用前几的进程
 memory() ->
   memory(10).
 memory(N) ->
