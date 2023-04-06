@@ -10,7 +10,7 @@
 -author("sunbin").
 
 %% API
--export([test_update_or_add/3]).
+-export([test_update_or_add/3, test_sort/0]).
 
 test_update_or_add(List, Key, Add) ->
   case lists:keyfind(Key, 1, List) of
@@ -19,3 +19,9 @@ test_update_or_add(List, Key, Add) ->
     _ ->
       [{Key, Add} | List]
   end.
+
+
+%%  [3,1,4,5,9] -> [9,5,4,3,1]
+test_sort() ->
+  List = [3,1,4,5,9],
+  lists:sort(fun(A,B) -> A>B end, List).
