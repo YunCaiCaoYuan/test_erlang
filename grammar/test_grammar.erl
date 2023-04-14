@@ -10,7 +10,7 @@
 -author("sunbin").
 
 %% API
--export([test_semicolon/1]).
+-export([test_semicolon/1, test_case/1]).
 
 test_semicolon(Val) ->
 	if
@@ -19,5 +19,17 @@ test_semicolon(Val) ->
 		Val == 3; Val == 4 ->
 			io:format("3 or 4~n");
 		true ->
+			io:format("other~n")
+	end.
+
+test_case(Val) ->
+	case Val of
+		1 ->
+			io:format("1~n");
+		_ when Val == 2; Val == 3 ->
+			io:format("2 or 3~n");
+		4 ->
+			io:format("4~n");
+		_ ->
 			io:format("other~n")
 	end.
