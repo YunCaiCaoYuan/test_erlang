@@ -10,13 +10,25 @@
 -author("sunbin").
 
 %% API
--export([test_semicolon/1, test_case/1]).
+-export([test_semicolon/1, test_comma/1, test_case/1]).
 
+%% 或
 test_semicolon(Val) ->
 	if
 		Val == 1; Val == 2 ->
 			io:format("1 or 2~n");
 		Val == 3; Val == 4 ->
+			io:format("3 or 4~n");
+		true ->
+			io:format("other~n")
+	end.
+
+%% 且
+test_comma(Val) ->
+	if
+		Val == 1, Val == 2 ->
+			io:format("1 or 2~n");
+		Val == 3, Val == 4 ->
 			io:format("3 or 4~n");
 		true ->
 			io:format("other~n")
