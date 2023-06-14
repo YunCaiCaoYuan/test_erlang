@@ -10,15 +10,27 @@
 -author("sunbin").
 
 %% API
--export([test/1]).
+%%-export([test/1]).
+-export([test2/1]).
 
 %%test_try_catch.erl:20: variable 'A1' unsafe in 'try' (line 16)
 %%test_try_catch.erl:20: variable 'A2' unsafe in 'try' (line 16)
-test(A) ->
+%%test(A) ->
+%%	try
+%%		[A1,A2|_] = A
+%%	catch
+%%		_:_ ->
+%%		io:format("error, A1:~p, A2:~p~n",[A1,A2])
+%%	end,
+%%	ok.
+
+test2(A) ->
 	try
-		[A1,A2|_] = A
+		[_A1,_A2|_] = A,
+		error({assert, con})
 	catch
-		_:_ ->
-		io:format("error, A1:~p, A2:~p~n",[A1,A2])
-	end,
-	ok.
+		_T:{assert, _}=_R ->
+			io:format("assert error, A:~p~n",[A]);
+		T:R ->
+			io:format("error, T:~p, R:~p~n",[T,R])
+	end.
