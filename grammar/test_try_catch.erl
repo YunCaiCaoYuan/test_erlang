@@ -28,9 +28,10 @@ test2(A) ->
 	try
 		[_A1,_A2|_] = A,
 		error({assert, con})
+%%		throw({assert, con})
 	catch
 		_T:{assert, _}=_R ->
-			io:format("assert error, A:~p~n",[A]);
+			io:format("assert error, A:~p~nT:~p~n",[A, _T]);
 		T:R ->
 			io:format("error, T:~p, R:~p~n",[T,R])
 	end.
