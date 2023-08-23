@@ -53,6 +53,7 @@ terminate(Reason, State) ->
 code_change(OldVsn, State, Extra) ->
 	{ok, State}.
 
+%% 了解邮箱情况，除了message_queue_len，20版本可以查看messages
 
 %% 查看当前收到的所有消息
 %% 启动跟踪器:
