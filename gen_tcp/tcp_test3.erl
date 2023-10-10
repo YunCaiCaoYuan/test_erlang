@@ -6,6 +6,11 @@
 %% PID    COMMAND      %CPU  TIME     #TH    #WQ  #PORTS MEM    PURG   CMPRS  PGRP  PPID  STATE    BOOSTS           %CPU_ME %CPU_OTHRS UID  FAULTS
 %% 60918  beam.smp     95.0  27:57.45 32/1   0    51     2048M+ 0B     1790M+ 60918 86465 running  *0[1]            0.00000 0.00000    501  4699010+
 
+%% socket信息
+%% inet:sockname(#Port<0.9>).
+%% {ok,{{127,0,0,1},9999}}
+%% inet:peername(#Port<0.9>).
+%% {ok,{{127,0,0,1},54805}}
 
 %% API
 -export([server/0, client/0]).
@@ -22,10 +27,12 @@ accept(Listen) ->
   accept(Listen).
 
 handle(Socket) ->
+    io:format("Socket:~w", [Socket]),
 %%  {ok, Data} = gen_tcp:recv(Socket, 0),
 %%  io:format("Received data: ~s~n", [Data]),
   gen_tcp:send(Socket, "Hello, client!").
 %%  gen_tcp:close(Socket).
+
 
 client()->
   {ok,Socket} = gen_tcp:connect({127,0,0,1},?PORT,[binary,{active,false}]),
@@ -33,7 +40,7 @@ client()->
 %%     gen_tcp:send(Socket, "1"),
      erlang:port_command(Socket, "1", [force]),
      io:format("~w~n", [Index])
-   end||Index<-lists:seq(1,10000*10000)].
+   end||Index<-lists:seq(1,1000*1000)].
 %%  gen_tcp:send(Socket, "12345"),
 %%  {ok, Data} = gen_tcp:recv(Socket, 0),
 %%  io:format("Received data: ~s~n", [Data]).
