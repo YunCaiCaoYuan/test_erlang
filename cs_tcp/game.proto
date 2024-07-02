@@ -1,0 +1,58 @@
+syntax = "proto3";
+package Game;
+
+// cmd:60001 && 开始游戏
+message StartGameReq
+{}
+// cmd:60002
+message StartGameResp
+{
+    int32 err_code = 1;
+}
+
+// cmd:60003 && 游戏结束 (两个玩家都挂了 或者是通关）
+message GameOverReq
+{}
+// cmd:60004
+message GameOverResp
+{
+    int32 err_code = 1;
+}
+
+// cmd:60005 && 退出游戏
+message GameQuitReq
+{}
+// cmd:60006
+message GameQuitResp
+{
+    int32 err_code = 1;
+}
+
+// cmd:60008 && 游戏结束同步
+message SyncGameOverStateResp
+{}
+
+// message包类型
+enum PackType
+{
+    None = 0;
+    Level= 1;   //同步玩家所在关卡
+    NewLevel = 2; //初始化同步的所有关卡数据
+    LevelRefresh =3; //同步刷新关卡
+    InitPlayerInfo =4;
+    CharacterState =5;
+    SynPack = 30; //同步包 主要是位置同步
+}
+
+// cmd:60021 && 同步包数据
+message SyncPackDataReq
+{
+    PackType pack_type = 1;
+    bytes pack_data = 2;
+}
+// cmd:60022
+message SyncPackDataResp
+{
+    PackType pack_type = 1;
+    bytes pack_data = 2;
+}
