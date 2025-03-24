@@ -4,7 +4,7 @@
 
     function svc_connectPlatform() {
         //alert("");
-        var wsServer = 'ws://127.0.0.1:88/';
+        var wsServer = 'ws://127.0.0.1:8800/';
         try {
             svc_websocket = new WebSocket(wsServer);
         } catch (evt) {
@@ -28,7 +28,7 @@
 
 
     function svc_onClose(evt) {
-        console.log("Disconnected");
+        console.log("Disconnected:", + evt);
     }
 
 

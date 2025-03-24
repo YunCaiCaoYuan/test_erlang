@@ -9,7 +9,7 @@
 start() ->
     inets:start(),
 
-    URL = "http://127.0.0.1:88",
+    URL = "http://127.0.0.1:8800",
     Headers = [
         {"origin", URL},
         {"connection", "Upgrade"},
