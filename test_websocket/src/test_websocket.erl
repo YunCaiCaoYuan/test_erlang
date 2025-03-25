@@ -150,7 +150,7 @@ loop(Socket, ConnState = #conn{status = read_payload_len2, mask = Mask}) ->
 			<<PayloadLen:64>> = <<Bin/binary>>,
 			case Mask of
 				?true ->
-					loop(Socket, ConnState = #conn{status = read_payload_data, mask = Mask, length = 4 + PayloadLen});
+					loop(Socket,  ConnState = #conn{status = read_payload_data, mask = Mask, length = 4 + PayloadLen});
 				?false ->
 					loop(Socket, ConnState = #conn{status = read_payload_data, mask = Mask, length = PayloadLen})
 			end;
